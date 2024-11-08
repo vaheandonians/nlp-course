@@ -1,0 +1,11 @@
+.venv
+.cadence
+.env
+.idea/**
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*.pywz
