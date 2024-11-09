@@ -53,7 +53,5 @@ if __name__ == "__main__":
     try:
         pdf = Pdf(ConfigManager().pdf_file_path)
         text = pdf.extract_text()
-        text_pages_1_3 = pdf.extract_text(pages=[1, 3])
-        page_2_text = pdf.get_page_text(2)
     except Exception as e:
         print(f"Error: {str(e)}")

@@ -1,11 +1,18 @@
+from pprint import pprint
+
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from artifacts.pdf import Pdf
 from config import ConfigManager
 from utils.validator import validate_args
 from dotenv import load_dotenv
+import faiss
+from langchain_community.docstore.in_memory import InMemoryDocstore
+from langchain_community.vectorstores import FAISS
+
 
 
 PROMPT_TEMPLATE = """
@@ -61,7 +68,6 @@ class TxtExtractor:
 
     @validate_args({"txt": str})
     def __init__(self, txt: str):
-        load_dotenv()
         self.model = ChatOpenAI(model=ConfigManager().openai_llm)
         self.txt = txt
         self.prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
@@ -71,12 +77,30 @@ class TxtExtractor:
         return self.chain.invoke({"TEXT_CORPUS": self.txt})
 
 
+#TODO: Quick and dirty test -> refactor
 if __name__ == "__main__":
     try:
-        pdf = Pdf(ConfigManager().pdf_file_path)
-        text = pdf.extract_text()
-        extractor = TxtExtractor(text)
-        extraction_result = extractor.extract()
-        print(extraction_result)
+        load_dotenv()
+
+        embeddings = OpenAIEmbeddings(model=ConfigManager().openai_embedding_model)
+        index = faiss.IndexFlatL2(len(embeddings.embed_query("hi")))
+
+        vector_store = FAISS(
+            embedding_function=embeddings,
+            index=index,
+            docstore=InMemoryDocstore(),
+            index_to_docstore_id={},
+        )
+
+        loader = PyPDFLoader(ConfigManager().pdf_file_path)
+        docs = loader.load()
+        vector_store.add_documents(docs)
+        result = vector_store.search(PROMPT_TEMPLATE, 'similarity')
+        pprint(result)
+        # pdf = Pdf(ConfigManager().pdf_file_path)
+        # text = pdf.extract_text()
+        # extractor = TxtExtractor(text)
+        # extraction_result = extractor.extract()
+        # print(extraction_result)
     except Exception as e:
         print(f"Error: {str(e)}")
