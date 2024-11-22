@@ -21,7 +21,7 @@ You are tasked with extracting the geographical breakdown of revenue from a larg
 First, carefully read through the following text corpus:
 
 <text_corpus>
-{TEXT_CORPUS}
+{CONTEXT}
 </text_corpus>
 
 To extract the geographical breakdown of revenue, follow these steps:
@@ -66,15 +66,14 @@ Remember to base your extraction solely on the information provided in the text 
 
 class TxtExtractor:
 
-    @validate_args({"txt": str})
-    def __init__(self, txt: str):
+    def __init__(self):
         self.model = ChatOpenAI(model=ConfigManager().openai_llm)
-        self.txt = txt
         self.prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
         self.chain = self.prompt | self.model | StrOutputParser()
 
-    def extract(self):
-        return self.chain.invoke({"TEXT_CORPUS": self.txt})
+    @validate_args({"context": str})
+    def extract(self, context: str):
+        return self.chain.invoke({"CONTEXT": context})
 
 
 #TODO: Quick and dirty test -> refactor
