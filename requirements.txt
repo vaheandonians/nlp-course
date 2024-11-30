@@ -9,3 +9,6 @@ pymupdf
 pypdf
 python-dotenv
 sentence-transformers
+transformers
+langchain-huggingface
+accelerate

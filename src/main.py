@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 
 from artifacts.pdf import Pdf
+from chat.local_rag_chat import LocalRagChat
 from chat.rag_chat import RagChat
 from config import ConfigManager
 from retrievers.faiss_retriever import FaissRetriever
@@ -36,7 +37,8 @@ if __name__ == '__main__':
         - uses the retriever to retrieve the most similar chunks
         - uses the llm to generate a response
     """
-    chat = RagChat(retriever)
+    # chat = RagChat(retriever)
+    chat = LocalRagChat(retriever)
     answer = chat.ask("What is the geographical distribution of revenue?")
 
     print(answer)
