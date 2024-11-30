@@ -23,7 +23,7 @@ class Pdf:
         if self.pdf_path.suffix.lower() != '.pdf':
             raise ValueError(f"File {self.pdf_path} is not a PDF")
 
-    def extract_text(self, pages: Optional[List[int]] = None) -> str:
+    def get_text(self, pages: Optional[List[int]] = None) -> str:
         try:
             with open(self.pdf_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -48,10 +48,3 @@ class Pdf:
         if not self.text:
             raise ValueError("No text has been extracted yet. Call extract_text() first")
         output_path.write_text(self.text, encoding='utf-8')
-
-if __name__ == "__main__":
-    try:
-        pdf = Pdf(ConfigManager().pdf_file_path)
-        text = pdf.extract_text()
-    except Exception as e:
-        print(f"Error: {str(e)}")
